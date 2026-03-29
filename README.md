@@ -1,10 +1,134 @@
-# 📈 StockSight
+| `portfolio_snapshots`| Daily portfolio value history  |
 
-A lightweight stock financial health dashboard. Search any ticker, compare up to 5 stocks side-by-side, and instantly see color-coded indicators for key metrics.
+---
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-red)
-![License](https://img.shields.io/badge/License-MIT-green)
+## 🛠️ Quick Start (Dev)
+
+```bash
+# Clone
+git clone git@github.com:roel-karstens/StockSight.git
+cd StockSight
+
+# Start all services (backend, db, redis, worker, beat)
+docker compose up --build
+
+# Open API docs
+open http://localhost:8000/docs
+```
+
+---
+
+## 📝 Migration Note
+
+The legacy Streamlit app remains available during migration. The new backend and frontend are built in parallel. See the `features/` folder for detailed specs and migration strategy.
+
+---
+
+## 📚 Further Reading
+
+- [spec-design-brief.md](features/spec-design-brief.md) — Project vision, user journey, design system
+- [spec-backend-services.md](features/spec-backend-services.md) — Data & logic layer
+- [spec-backend-infra.md](features/spec-backend-infra.md) — Infrastructure & orchestration
+- [spec-backend-api.md](features/spec-backend-api.md) — API surface & schemas
+
+---
+
+## License
+
+MIT
+- Animated, responsive UI
+
+---
+
+## 🗄️ Backend API
+
+All endpoints documented at `/docs` (Swagger UI):
+
+**Stock endpoints:**
+- `GET  /api/v1/stocks/search?q={query}` — Search by ticker/name
+- `GET  /api/v1/stocks/{ticker}` — Stock metadata
+- `GET  /api/v1/stocks/{ticker}/fundamentals` — 10yr quality data
+- `GET  /api/v1/stocks/{ticker}/prices?period=10y` — Price history
+- `GET  /api/v1/stocks/compare?tickers=MSFT,AAPL,GOOGL` — Multi-stock compare
+- `POST /api/v1/stocks/{ticker}/dcf` — Compute DCF
+- `GET  /api/v1/stocks/{ticker}/reverse-dcf` — Reverse DCF
+
+**Portfolio endpoints:**
+- `GET    /api/v1/portfolio/holdings` — List all holdings
+- `POST   /api/v1/portfolio/holdings` — Add holding
+- `PUT    /api/v1/portfolio/holdings/{id}` — Update holding
+- `DELETE /api/v1/portfolio/holdings/{id}` — Remove holding
+- `GET    /api/v1/portfolio/stats` — Totals, beta, quality avg
+- `GET    /api/v1/portfolio/allocations` — Country/sector/cap breakdowns
+- `GET    /api/v1/portfolio/performance` — Historical value vs SPY
+
+---
+
+## 🗃️ Data Model
+
+| Table                | Purpose                        |
+|----------------------|--------------------------------|
+| `stocks`             | Master stock metadata          |
+| `fundamentals`       | Annual financial data per stock|
+| `prices`             | Daily OHLCV prices             |
+| `portfolio_holdings` | User's holdings                |
+| `portfolio_snapshots`| Daily portfolio value history  |
+- stockanalysis.com (10yr financials via scraping)
+
+---
+
+## 🔑 Core Features
+
+- 10 years of annual data (yfinance + stockanalysis.com)
+- Persistent DB storage (PostgreSQL)
+- Background refresh (Celery Beat)
+- Redis caching (configurable TTL)
+- Portfolio tracking (CRUD, daily snapshots)
+- Allocation & performance charts
+- Portfolio beta & quality alerts
+- DCF & reverse DCF tools
+- Quality radar & trend charts
+- Animated, responsive UI
+
+# 📈 StockSight — Quality Investing Dashboard
+
+StockSight is a full-stack, production-grade quality investing dashboard. Research any stock, compare up to 5 side-by-side, and track your portfolio’s health with 10 years of financial data, advanced valuation tools, and persistent storage.
+
+---
+
+## 🚀 What is StockSight?
+
+StockSight replaces the original Streamlit app with a modern, service-oriented architecture:
+
+- **Single-page React frontend**: Smooth scroll, 6 research/portfolio sections, beautiful charts, and instant feedback.
+- **FastAPI backend**: Async Python, robust REST API, OpenAPI docs, and background data refresh.
+- **PostgreSQL & Redis**: Persistent storage and fast caching.
+- **Celery**: Automated nightly and hourly data refresh.
+
+---
+
+## 🧭 User Journey
+
+The app is a single scrollable page with 6 sections:
+
+1. **Search** — Find a stock, see quality badge & sparkline
+2. **Quality** — Radar chart, 6 quality criteria, 10yr trends
+3. **Valuation** — DCF intrinsic value, reverse DCF heatmap
+4. **Compare** — Overlay charts, scorecard table vs 4 others
+5. **Portfolio** — Holdings, allocation donuts, performance
+6. **Alerts** — Auto-generated health cards from portfolio
+
+---
+
+## 🏗️ Architecture & Tech Stack
+
+**Frontend:** React 18, Vite, TailwindCSS, Recharts, Zustand, TanStack Query, Axios  
+**Backend:** FastAPI (Python 3.11), SQLAlchemy (async), Alembic, Pydantic, Loguru  
+**Infra:** PostgreSQL 16, Redis 7, Celery, Docker Compose
+
+**Data sources:**
+- yfinance (prices, fundamentals, beta)
+- stockanalysis.com (10yr financials via scraping)
 
 ## Metrics
 
